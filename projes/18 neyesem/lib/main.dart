@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -38,12 +39,41 @@ class YemekSayfasi extends StatefulWidget {
 
 class _YemekSayfasiState extends State<YemekSayfasi> {
   int CorbaNo = 1;
-
   int YemekNo = 1;
-
   int TatliNo = 1;
+  List<String> corbaName = [
+    "Mercimek Çorbası",
+    "Tarhana Çorbası",
+    "Tavuk suyu Çorba",
+    "Düğün Çorbası",
+    "Yoğurtlu Çorba"
+  ];
+
+  List<String> yemekName = [
+    "Karnıyarık",
+    "Mantı",
+    "Kuru Fasulye",
+    "İçli Köfte",
+    "Izgara Balık"
+  ];
+
+  List<String> tatliName = [
+    "Kadayıf",
+    "Baklava",
+    "Sütlaç",
+    "Kazandibi",
+    "Dondurma"
+  ];
 
   Random rnd = new Random();
+
+  void ChangeFood() {
+    setState(() {
+      CorbaNo = rnd.nextInt(5) + 1;
+      YemekNo = rnd.nextInt(5) + 1;
+      TatliNo = rnd.nextInt(5) + 1;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +85,21 @@ class _YemekSayfasiState extends State<YemekSayfasi> {
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextButton(
-                  onPressed: () {
-                    CorbaNo = rnd.nextInt(5) + 1;
-                  },
+                  onPressed: ChangeFood,
                   child: Image.asset("assets/images/corba_$CorbaNo.jpg")),
+            ),
+          ),
+          Text(
+            corbaName[CorbaNo - 1],
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+          Container(
+            width: 200,
+            child: Divider(
+              height: 5,
+              color: Colors.black,
             ),
           ),
           Expanded(
@@ -69,10 +110,21 @@ class _YemekSayfasiState extends State<YemekSayfasi> {
                   color: Colors.black,
                   highlightColor: Colors.pinkAccent,
                   splashColor: Colors.green,
-                  onPressed: () {
-                    YemekNo = rnd.nextInt(5) + 1;
-                  },
+                  onPressed: ChangeFood,
                   child: Image.asset("assets/images/yemek_$YemekNo.jpg")),
+            ),
+          ),
+          Text(
+            yemekName[YemekNo - 1],
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+          Container(
+            width: 200,
+            child: Divider(
+              height: 5,
+              color: Colors.black,
             ),
           ),
           Expanded(
@@ -80,10 +132,21 @@ class _YemekSayfasiState extends State<YemekSayfasi> {
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: FlatButton(
-                  onPressed: () {
-                    TatliNo = rnd.nextInt(5) + 1;
-                  },
+                  onPressed: ChangeFood,
                   child: Image.asset("assets/images/tatli_$TatliNo.jpg")),
+            ),
+          ),
+          Text(
+            tatliName[TatliNo - 1],
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+          Container(
+            width: 200,
+            child: Divider(
+              height: 5,
+              color: Colors.black,
             ),
           ),
         ],
