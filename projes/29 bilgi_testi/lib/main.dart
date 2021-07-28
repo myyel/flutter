@@ -1,3 +1,4 @@
+import 'package:bilgi_testi/test_veri.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -26,26 +27,25 @@ class SoruSayfasi extends StatefulWidget {
 
 class _SoruSayfasiState extends State<SoruSayfasi> {
   int i = 0;
+  bool yanit = true;
   String soru = "Bilgi Testi Soruları";
   List<Widget> sayac = [];
-  List<String> sorular = [
-    "Titanic gelmiş geçmiş en büyük gemidir",
-    "Dünyadaki tavuk sayısı insan sayısından fazladır",
-    "Kelebeklerin ömrü bir gündür",
-    "Dünya düzdür",
-    "Kaju fıstığı aslında bir meyvenin sapıdır",
-    "Fatih Sultan Mehmet hiç patates yememiştir",
-    "Fransızlar 80 demek için, 4 - 20 der",
-    "Sorular bitmiştir"
-  ];
+  TestVeri test_1 = new TestVeri();
 
   void sorugoster() {
+    if (i == 8 || i == 0) {
+    } else {
+      yanit == test_1.SoruBankasi[i - 1].yanit
+          ? sayac.add(kDogru)
+          : sayac.add(kYanlis);
+    }
+
     if (i == 8) {
       i = 0;
       soru = "Bilgi Testi Soruları";
       sayac.clear();
     }
-    soru = sorular[i];
+    soru = test_1.SoruBankasi[i].soru;
     i++;
   }
 
@@ -73,9 +73,8 @@ class _SoruSayfasiState extends State<SoruSayfasi> {
         ),
         Wrap(
           direction: Axis.horizontal,
-          spacing: 20,
-          runSpacing: 20,
-          alignment: WrapAlignment.end,
+          spacing: 10,
+          runSpacing: 10,
           children: sayac,
         ),
         Expanded(
@@ -96,8 +95,8 @@ class _SoruSayfasiState extends State<SoruSayfasi> {
                           ),
                           onPressed: () {
                             setState(() {
+                              yanit = false;
                               sorugoster();
-                              sayac.add(kYanlis);
                             });
                           },
                         ))),
@@ -111,8 +110,8 @@ class _SoruSayfasiState extends State<SoruSayfasi> {
                           child: Icon(Icons.thumb_up, size: 30.0),
                           onPressed: () {
                             setState(() {
+                              yanit = true;
                               sorugoster();
-                              sayac.add(kDogru);
                             });
                           },
                         ))),
