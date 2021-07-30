@@ -33,20 +33,38 @@ class _SoruSayfasiState extends State<SoruSayfasi> {
   TestVeri test_1 = new TestVeri();
 
   void sorugoster() {
-    if (i == 8 || i == 0) {
+    if (TestVeri().testBittiMi(i) || i == 0) {
     } else {
-      yanit == test_1.SoruBankasi[i - 1].yanit
-          ? sayac.add(kDogru)
-          : sayac.add(kYanlis);
+      yanit == test_1.getYanit(i - 1) ? sayac.add(kDogru) : sayac.add(kYanlis);
     }
 
-    if (i == 8) {
+    if (TestVeri().testBittiMi(i)) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("BRAVO TESTİ BİTİRDİNİZ"),
+              actions: [
+                FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: new Text("BAŞA DÖN"))
+              ],
+            );
+          });
       i = 0;
-      soru = "Bilgi Testi Soruları";
       sayac.clear();
     }
-    soru = test_1.SoruBankasi[i].soru;
+    soru = test_1.getSoru(i);
     i++;
+  }
+
+  void butonFonk({required bool rspnd}) {
+    setState(() {
+      yanit = rspnd;
+      sorugoster();
+    });
   }
 
   @override
@@ -94,10 +112,7 @@ class _SoruSayfasiState extends State<SoruSayfasi> {
                             size: 30.0,
                           ),
                           onPressed: () {
-                            setState(() {
-                              yanit = false;
-                              sorugoster();
-                            });
+                            butonFonk(rspnd: false);
                           },
                         ))),
                 Expanded(
@@ -110,8 +125,7 @@ class _SoruSayfasiState extends State<SoruSayfasi> {
                           child: Icon(Icons.thumb_up, size: 30.0),
                           onPressed: () {
                             setState(() {
-                              yanit = true;
-                              sorugoster();
+                              butonFonk(rspnd: true);
                             });
                           },
                         ))),
