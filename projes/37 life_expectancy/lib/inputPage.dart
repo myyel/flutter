@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:life_expectancy/constants.dart';
 
 import 'myWidgets.dart';
 
@@ -10,6 +11,8 @@ class InputPage extends StatefulWidget {
 
 class _InputPageState extends State<InputPage> {
   String seciliButon = "";
+  int boy = 170;
+  int kilo = 60;
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +31,14 @@ class _InputPageState extends State<InputPage> {
             child: Row(
               children: [
                 Expanded(
-                  child: MyContainer(),
+                  child: MyContainer(
+                    child: buildRowOutlineButton("BOY"),
+                  ),
                 ),
                 Expanded(
-                  child: MyContainer(),
+                  child: MyContainer(
+                    child: buildRowOutlineButton("KİLO"),
+                  ),
                 ),
               ],
             ),
@@ -90,6 +97,78 @@ class _InputPageState extends State<InputPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Row buildRowOutlineButton(String yazi) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        RotatedBox(
+          quarterTurns: -1,
+          child: Text(
+            yazi,
+            style: kTittleText,
+          ),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        RotatedBox(
+          quarterTurns: -1,
+          child: Text(
+            yazi == "BOY" ? boy.toString() : kilo.toString(),
+            style: kContentText,
+          ),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ButtonTheme(
+              height: 36,
+              minWidth: 36,
+              child: OutlineButton(
+                borderSide: BorderSide(
+                  color: Colors.lightBlue,
+                ),
+                onPressed: () => {
+                  setState(() {
+                    yazi == "BOY" ? boy++ : kilo++;
+                  })
+                },
+                child: Icon(
+                  FontAwesomeIcons.plus,
+                  size: 10,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ButtonTheme(
+              height: 36,
+              minWidth: 36,
+              child: OutlineButton(
+                borderSide: BorderSide(
+                  color: Colors.lightBlue,
+                ),
+                onPressed: () => {
+                  setState(() {
+                    yazi == "BOY" ? boy-- : kilo--;
+                  })
+                },
+                child: Icon(
+                  FontAwesomeIcons.minus,
+                  size: 10,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

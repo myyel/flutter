@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:life_expectancy/constants.dart';
 
 class IconCinsiyet extends StatelessWidget {
   final IconData fontIcon;
@@ -21,11 +22,7 @@ class IconCinsiyet extends StatelessWidget {
         ),
         Text(
           yazi,
-          style: TextStyle(
-            color: Colors.black54,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: kTittleText,
         )
       ],
     );
@@ -90,15 +87,11 @@ class _SliderColumnState extends State<SliderColumn> {
       children: [
         Text(
           soru,
-          style: TextStyle(
-              color: Colors.black54, fontSize: 20, fontWeight: FontWeight.bold),
+          style: kTittleText,
         ),
         Text(
           deger.round().toString(),
-          style: TextStyle(
-              color: Colors.lightBlue,
-              fontSize: 30,
-              fontWeight: FontWeight.bold),
+          style: kContentText,
         ),
         Slider(
           value: deger,
