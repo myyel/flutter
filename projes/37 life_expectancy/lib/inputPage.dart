@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:life_expectancy/constants.dart';
+import 'package:life_expectancy/result_page.dart';
+import 'package:life_expectancy/userData.dart';
 
 import 'myWidgets.dart';
 
@@ -10,10 +12,8 @@ class InputPage extends StatefulWidget {
 }
 
 class _InputPageState extends State<InputPage> {
-  String seciliButon = "";
-  int boy = 170;
-  int kilo = 60;
-
+  UserData _userData =
+      UserData(sigara: 15, seciliButon: "", spor: 3, boy: 170, kilo: 60);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,21 +45,56 @@ class _InputPageState extends State<InputPage> {
           ),
           Expanded(
             child: MyContainer(
-              child: SliderColumn(
-                degerMax: 7,
-                degerMin: 0,
-                soru: "Haftada kaç gün spor yapıyorsunuz?",
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Haftada kaç gün spor yapıyorsunuz?",
+                    style: kTittleText,
+                  ),
+                  Text(
+                    _userData.spor.round().toString(),
+                    style: kContentText,
+                  ),
+                  Slider(
+                    min: 0,
+                    max: 7,
+                    value: _userData.spor,
+                    onChanged: (double _newCigarette) {
+                      setState(() {
+                        _userData.spor = _newCigarette;
+                      });
+                    },
+                  ),
+                ],
               ),
             ),
           ),
           Expanded(
             child: MyContainer(
-              child: SliderColumn(
-                degerMax: 40,
-                degerMin: 0,
-                soru: "Günde kaç tane sigara içiyorsunuz?",
-              ),
-            ),
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Günde kaç tane sigara içiyorsunuz?",
+                  style: kTittleText,
+                ),
+                Text(
+                  _userData.sigara.round().toString(),
+                  style: kContentText,
+                ),
+                Slider(
+                  min: 0,
+                  max: 40,
+                  value: _userData.sigara,
+                  onChanged: (double _newCigarette) {
+                    setState(() {
+                      _userData.sigara = _newCigarette;
+                    });
+                  },
+                ),
+              ],
+            )),
           ),
           Expanded(
             child: Row(
@@ -68,10 +103,12 @@ class _InputPageState extends State<InputPage> {
                   child: MyContainer(
                     onPress: () {
                       setState(() {
-                        seciliButon = "KADIN";
+                        _userData.seciliButon = "KADIN";
                       });
                     },
-                    renk: seciliButon == "KADIN" ? Colors.grey : Colors.white,
+                    renk: _userData.seciliButon == "KADIN"
+                        ? Colors.grey
+                        : Colors.white,
                     child: IconCinsiyet(
                       fontIcon: FontAwesomeIcons.venus,
                       yazi: "KADIN",
@@ -82,10 +119,12 @@ class _InputPageState extends State<InputPage> {
                   child: MyContainer(
                     onPress: () {
                       setState(() {
-                        seciliButon = "ERKEK";
+                        _userData.seciliButon = "ERKEK";
                       });
                     },
-                    renk: seciliButon == "ERKEK" ? Colors.grey : Colors.white,
+                    renk: _userData.seciliButon == "ERKEK"
+                        ? Colors.grey
+                        : Colors.white,
                     child: IconCinsiyet(
                       fontIcon: FontAwesomeIcons.mars,
                       yazi: "ERKEK",
@@ -93,6 +132,22 @@ class _InputPageState extends State<InputPage> {
                   ),
                 ),
               ],
+            ),
+          ),
+          ButtonTheme(
+            height: 50,
+            child: FlatButton(
+              onPressed: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ResultPage(_userData)))
+              },
+              child: Text(
+                "HESAPLA",
+                style: kTittleText,
+              ),
+              color: Colors.white,
             ),
           ),
         ],
@@ -117,7 +172,9 @@ class _InputPageState extends State<InputPage> {
         RotatedBox(
           quarterTurns: -1,
           child: Text(
-            yazi == "BOY" ? boy.toString() : kilo.toString(),
+            yazi == "BOY"
+                ? _userData.boy.toString()
+                : _userData.kilo.toString(),
             style: kContentText,
           ),
         ),
@@ -136,7 +193,7 @@ class _InputPageState extends State<InputPage> {
                 ),
                 onPressed: () => {
                   setState(() {
-                    yazi == "BOY" ? boy++ : kilo++;
+                    yazi == "BOY" ? _userData.boy++ : _userData.kilo++;
                   })
                 },
                 child: Icon(
@@ -157,7 +214,7 @@ class _InputPageState extends State<InputPage> {
                 ),
                 onPressed: () => {
                   setState(() {
-                    yazi == "BOY" ? boy-- : kilo--;
+                    yazi == "BOY" ? _userData.boy-- : _userData.kilo--;
                   })
                 },
                 child: Icon(
