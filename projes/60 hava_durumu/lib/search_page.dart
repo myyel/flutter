@@ -30,6 +30,7 @@ class _SearchPageState extends State<SearchPage> {
               Padding(
                 padding: const EdgeInsets.all(75),
                 child: TextField(
+                  autofocus: true,
                   decoration: InputDecoration(hintText: "Şehir"),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 20),
