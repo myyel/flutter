@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:hava_durumu/search_page.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,13 +15,32 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String sehir = "Ankara";
-  double? sicaklik;
+  int? sicaklik;
   var woeid;
-  var urlSehir = Uri.parse(
-      "https://www.metaweather.com/api/location/search/?query=ankara");
-
+  String abbr = "c";
   var locationData;
+  late Position position;
+
+  Future<void> getDevicePosition() async {
+    print(position);
+    position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.medium,
+    );
+    print(position);
+  }
+
+  Future<void> getLocationDataLatLong() async {
+    var urlSehir = Uri.parse(
+        "https://www.metaweather.com/api/location/search/?lattlong=${position!.latitude},${position!.longitude}");
+    locationData = await http.get(urlSehir);
+    var locationDataParsed = jsonDecode(locationData.body);
+    woeid = locationDataParsed[0]["woeid"];
+    sehir = locationDataParsed[0]["title"];
+  }
+
   Future<void> getLocationData() async {
+    var urlSehir = Uri.parse(
+        "https://www.metaweather.com/api/location/search/?query=$sehir");
     locationData = await http.get(urlSehir);
     var locationDataParsed = jsonDecode(locationData.body);
     woeid = locationDataParsed[0]["woeid"];
@@ -31,10 +51,22 @@ class _HomePageState extends State<HomePage> {
         .get(Uri.parse("https://www.metaweather.com/api/location/$woeid/"));
 
     var tempatureDataParsed = jsonDecode(response.body);
-    sicaklik = tempatureDataParsed["consolidated_weather"][2]["the_temp"];
+
+    setState(() {
+      sicaklik =
+          tempatureDataParsed["consolidated_weather"][2]["the_temp"].round();
+      abbr =
+          tempatureDataParsed["consolidated_weather"][1]["weather_state_abbr"];
+    });
   }
 
-  void getDataFromAPI() async {
+  Future<void> getDataFromAPI() async {
+    await getDevicePosition();
+    await getLocationDataLatLong();
+    getLocationTempature();
+  }
+
+  Future<void> getDataFromAPIbyCity() async {
     await getLocationData();
     getLocationTempature();
   }
@@ -42,7 +74,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     getDataFromAPI();
-    print(woeid);
     super.initState();
   }
 
@@ -52,44 +83,70 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: AssetImage("assets/c.jpg"),
+          image: AssetImage("assets/$abbr.jpg"),
         ),
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "$sicaklik° C",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 70,
+      child: sicaklik == null || abbr == ""
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "$sicaklik° C",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 70,
+                        shadows: <Shadow>[
+                          Shadow(
+                            color: Colors.black38,
+                            blurRadius: 5,
+                            offset: Offset(-3, 3),
+                          )
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          sehir,
+                          style: TextStyle(
+                            fontSize: 30,
+                            shadows: <Shadow>[
+                              Shadow(
+                                color: Colors.black38,
+                                blurRadius: 5,
+                                offset: Offset(-3, 3),
+                              )
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            sehir = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SearchPage(),
+                              ),
+                            );
+                            getDataFromAPIbyCity();
+                            setState(() {
+                              sehir = sehir;
+                            });
+                          },
+                          icon: Icon(Icons.search),
+                        )
+                      ],
+                    )
+                  ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    sehir,
-                    style: TextStyle(fontSize: 30),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SearchPage()),
-                      );
-                    },
-                    icon: Icon(Icons.search),
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
