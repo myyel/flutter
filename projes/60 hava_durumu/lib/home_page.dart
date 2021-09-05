@@ -14,18 +14,42 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String sehir = "Ankara";
+  String sehir = "";
   int? sicaklik;
   var woeid;
   String abbr = "c";
   var locationData;
-  late Position position;
+  Position? position;
+  List<String> temps = ["", "", "", "", ""];
+  List<String> img = [
+    "",
+    "",
+    "",
+    "",
+    "",
+  ];
+  List<String> date = [
+    "",
+    "",
+    "",
+    "",
+    "",
+  ];
+  List<String> days = [
+    "",
+    "",
+    "",
+    "",
+    "",
+  ];
 
   Future<void> getDevicePosition() async {
-    print(position);
-    position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.medium,
-    );
+    try {
+      position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.low);
+    } catch (error) {
+      print(error);
+    }
     print(position);
   }
 
@@ -54,9 +78,27 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       sicaklik =
-          tempatureDataParsed["consolidated_weather"][2]["the_temp"].round();
+          tempatureDataParsed["consolidated_weather"][0]["the_temp"].round();
+      for (int i = 0; i < 5; i++) {
+        temps[i] = tempatureDataParsed["consolidated_weather"][i + 1]
+                ["the_temp"]
+            .round()
+            .toString();
+      }
+
       abbr =
-          tempatureDataParsed["consolidated_weather"][1]["weather_state_abbr"];
+          tempatureDataParsed["consolidated_weather"][0]["weather_state_abbr"];
+
+      for (int i = 0; i < 5; i++) {
+        img[i] = tempatureDataParsed["consolidated_weather"][i + 1]
+            ["weather_state_abbr"];
+      }
+
+      for (int i = 0; i < 5; i++) {
+        date[i] = tempatureDataParsed["consolidated_weather"][i + 1]
+            ["applicable_date"];
+        print(date[0]);
+      }
     });
   }
 
@@ -75,6 +117,49 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     getDataFromAPI();
     super.initState();
+  }
+
+  List<DailyWeather> CreatCards() {
+    List<DailyWeather> cards = [
+      DailyWeather(abbr: "abbr", sicaklik: "sicaklik", tarih: "tarih"),
+      DailyWeather(abbr: "abbr", sicaklik: "sicaklik", tarih: "tarih"),
+      DailyWeather(abbr: "abbr", sicaklik: "sicaklik", tarih: "tarih"),
+      DailyWeather(abbr: "abbr", sicaklik: "sicaklik", tarih: "tarih"),
+      DailyWeather(abbr: "abbr", sicaklik: "sicaklik", tarih: "tarih")
+    ];
+
+    for (int i = 0; i < img.length; i++) {
+      DateTime gun = DateTime.parse(date[i]);
+      switch (gun.weekday) {
+        case 1:
+          days[i] = "Pazartesi";
+          break;
+        case 2:
+          days[i] = "Salı";
+          break;
+        case 3:
+          days[i] = "Çarşamba";
+          break;
+        case 4:
+          days[i] = "Perşembe";
+          break;
+        case 5:
+          days[i] = "Cuma";
+          break;
+        case 6:
+          days[i] = "Cumartesi";
+          break;
+        case 7:
+          days[i] = "Pazar";
+          break;
+      }
+    }
+
+    for (int i = 0; i < img.length; i++) {
+      cards[i] = DailyWeather(abbr: img[i], sicaklik: temps[i], tarih: days[i]);
+    }
+
+    return cards;
   }
 
   @override
@@ -96,6 +181,12 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Container(
+                      height: 60,
+                      width: 60,
+                      child: Image.network(
+                          "https://www.metaweather.com/static/img/weather/png/$abbr.png"),
+                    ),
                     Text(
                       "$sicaklik° C",
                       style: TextStyle(
@@ -142,11 +233,58 @@ class _HomePageState extends State<HomePage> {
                           icon: Icon(Icons.search),
                         )
                       ],
-                    )
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * .1,
+                    ),
+                    Container(
+                      height: 120,
+                      //width: MediaQuery.of(context).size.width * .9,
+                      child: FractionallySizedBox(
+                        widthFactor: .9,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: CreatCards(),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
+    );
+  }
+}
+
+class DailyWeather extends StatelessWidget {
+  final String abbr;
+  final String sicaklik;
+  final String tarih;
+
+  const DailyWeather(
+      {required this.abbr, required this.sicaklik, required this.tarih});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      color: Colors.transparent,
+      child: Container(
+        height: 120,
+        width: 100,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.network(
+              "https://www.metaweather.com/static/img/weather/png/$abbr.png",
+              height: 50,
+              width: 50,
+            ),
+            Text("$sicaklik° C"),
+            Text(tarih),
+          ],
+        ),
+      ),
     );
   }
 }
