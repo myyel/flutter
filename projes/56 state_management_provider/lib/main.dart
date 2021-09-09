@@ -45,20 +45,32 @@ class MyHomePage extends StatelessWidget {
 class SolWidgetA extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    String sehir = Provider.of<StateData>(context).sehir;
+    ;
     return Container(
         color: Colors.yellow,
-        child: Column(
-          children: [
-            Text(
-              'Sol Widget',
-              style: TextStyle(fontSize: 20),
-            ),
-            Text(
-              'Sehir: $sehir',
-              style: TextStyle(fontSize: 20),
-            )
-          ],
+        child: Consumer<StateData>(
+          builder: (context, data, child) {
+            return Column(
+              children: [
+                Text(
+                  'Sol Widget',
+                  style: TextStyle(fontSize: 20),
+                ),
+                Text(
+                  'Sehir: ${data.sehir}',
+                  style: TextStyle(fontSize: 20),
+                ),
+                Text(
+                  'İlçe: ${data.ilce}',
+                  style: TextStyle(fontSize: 20),
+                ),
+                Text(
+                  'Mahalle: ${data.mahalle}',
+                  style: TextStyle(fontSize: 20),
+                )
+              ],
+            );
+          },
         ));
   }
 }
