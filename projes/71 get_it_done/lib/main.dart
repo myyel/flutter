@@ -3,11 +3,20 @@ import 'package:get_it_done/models/items_data.dart';
 import 'package:get_it_done/screens/home_page.dart';
 import 'package:provider/provider.dart';
 
+import 'models/theme_data.dart';
+
 void main() {
   runApp(
-    ChangeNotifierProvider<Itemdata>(
+    MultiProvider(
       child: MyApp(),
-      create: (BuildContext context) => Itemdata(),
+      providers: [
+        ChangeNotifierProvider<ItemData>(
+          create: (BuildContext context) => ItemData(),
+        ),
+        ChangeNotifierProvider<ColorThemeData>(
+          create: (BuildContext context) => ColorThemeData(),
+        ),
+      ],
     ),
   );
 }
@@ -18,20 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primaryColor: Colors.green,
-        primarySwatch: Colors.green,
-        scaffoldBackgroundColor: Colors.green,
-        accentColor: Colors.green,
-        appBarTheme: AppBarTheme(
-          color: Colors.green,
-        ),
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        textTheme: TextTheme(
-          subtitle1: TextStyle(color: Colors.white),
-          headline3: TextStyle(color: Colors.white),
-        ),
-      ),
+      theme: Provider.of<ColorThemeData>(context).selectedThemeData,
       home: HomePage(),
     );
   }
