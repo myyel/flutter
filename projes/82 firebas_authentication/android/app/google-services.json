@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "16344288540",
+    "project_id": "fir-authentication-setup",
+    "storage_bucket": "fir-authentication-setup.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:16344288540:android:bf1f7e9fe0c42fb287fed9",
+        "android_client_info": {
+          "package_name": "com.myyel.firebas_authentication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "16344288540-5871q0opinbhbqmj83hcf8ljno9nbs2o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_FPsGERcpi69trdifTR3LVKrOXBO-TRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "16344288540-5871q0opinbhbqmj83hcf8ljno9nbs2o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
