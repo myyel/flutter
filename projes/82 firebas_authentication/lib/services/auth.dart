@@ -7,4 +7,8 @@ class Auth {
     final userCredentials = await _firebaseAuth.signInAnonymously();
     return userCredentials.user;
   }
+
+  Future<void> signOutAnonymous() async {
+    await FirebaseAuth.instance.signOut();
+  }
 }

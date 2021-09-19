@@ -1,6 +1,8 @@
+import 'package:firebas_authentication/services/auth.dart';
 import 'package:firebas_authentication/widgets/my_raised_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -12,8 +14,8 @@ class SignInPage extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                print("Çıkış Yapıldı");
+                await Provider.of<Auth>(context, listen: false)
+                    .signOutAnonymous();
               },
               icon: Icon(Icons.logout))
         ],
@@ -33,10 +35,9 @@ class SignInPage extends StatelessWidget {
               color: Colors.orangeAccent,
               child: Text("Sign in anonymously"),
               onPressed: () async {
-                UserCredential userCredential =
-                    await FirebaseAuth.instance.signInAnonymously();
-                print(userCredential);
-                print("Giriş yapıldı");
+                final User? userCredential =
+                    await Provider.of<Auth>(context, listen: false)
+                        .signInAnonymous();
               },
             ),
             MyRaisedButton(
