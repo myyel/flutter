@@ -1,11 +1,17 @@
 import 'package:firebas_authentication/services/auth.dart';
 import 'package:firebas_authentication/widgets/my_raised_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
+
+  @override
+  _SignInPageState createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  bool _isLoad = false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +40,7 @@ class SignInPage extends StatelessWidget {
             MyRaisedButton(
               color: Colors.orangeAccent,
               child: Text("Sign in anonymously"),
-              onPressed: () async {
-                final User? userCredential =
-                    await Provider.of<Auth>(context, listen: false)
-                        .signInAnonymous();
-              },
+              onPressed: () async {},
             ),
             MyRaisedButton(
               color: Colors.yellow,
