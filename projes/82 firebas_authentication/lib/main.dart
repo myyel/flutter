@@ -17,11 +17,12 @@ class MyApp extends StatelessWidget {
     return Provider<Auth>(
       create: (context) => Auth(),
       child: MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: OnboardWidget()),
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: OnboardWidget(),
+      ),
     );
   }
 }

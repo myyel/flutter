@@ -1,4 +1,5 @@
 import 'package:firebas_authentication/services/auth.dart';
+import 'package:firebas_authentication/views/email_sign_in.dart';
 import 'package:firebas_authentication/widgets/my_raised_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,8 +12,6 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  bool _isLoad = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,12 +39,18 @@ class _SignInPageState extends State<SignInPage> {
             MyRaisedButton(
               color: Colors.orangeAccent,
               child: Text("Sign in anonymously"),
-              onPressed: () async {},
+              onPressed: () async {
+                final user = await Provider.of<Auth>(context, listen: false)
+                    .signInAnonymous();
+              },
             ),
             MyRaisedButton(
               color: Colors.yellow,
               child: Text("Sign in email/password"),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => EmailSignInPage()));
+              },
             ),
             MyRaisedButton(
               color: Colors.lightBlueAccent,
