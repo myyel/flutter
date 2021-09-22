@@ -1,5 +1,7 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebas_authentication/services/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 enum FormStatus { signIn, register }
 
@@ -69,7 +71,6 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                 }
               },
               obscureText: true,
-              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.lock),
                 hintText: "Şifre",
@@ -102,6 +103,10 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
 
   Widget buildRegisterInForm() {
     final _registerKey = GlobalKey<FormState>();
+    final TextEditingController _emailController = TextEditingController();
+    final TextEditingController _passwordController = TextEditingController();
+    final TextEditingController _passwordConfirmController =
+        TextEditingController();
 
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -115,6 +120,14 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
               style: TextStyle(fontSize: 25),
             ),
             TextFormField(
+              controller: _emailController,
+              validator: (input) {
+                if (!EmailValidator.validate(input!)) {
+                  return "Geçerli bir email adresi giriniz";
+                } else {
+                  return null;
+                }
+              },
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.email),
@@ -127,8 +140,15 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
               height: 10,
             ),
             TextFormField(
+              controller: _passwordController,
+              validator: (input) {
+                if (input!.length < 6) {
+                  return "en az 6 karakter giriniz";
+                } else {
+                  return null;
+                }
+              },
               obscureText: true,
-              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.lock),
                 hintText: "Şifre",
@@ -140,8 +160,15 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
               height: 10,
             ),
             TextFormField(
+              controller: _passwordConfirmController,
+              validator: (value) {
+                if (value != _passwordController.text) {
+                  return "Şifreler uyuşmuyor";
+                } else {
+                  return null;
+                }
+              },
               obscureText: true,
-              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.lock),
                 hintText: "Şifre Onay",
@@ -153,7 +180,21 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
               height: 10,
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                if (_registerKey.currentState!.validate()) {
+                  final user = await Provider.of<Auth>(context, listen: false)
+                      .createUserWithEmailAndPassword(
+                          _emailController.text, _passwordController.text);
+
+                  if (user != null && !user.emailVerified) {
+                    await user.sendEmailVerification();
+                  }
+                  await _showMyDialog();
+                  setState(() {
+                    _formStatus = FormStatus.signIn;
+                  });
+                }
+              },
               child: Text("Kayıt ol"),
             ),
             TextButton(
@@ -167,6 +208,34 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Onay Gerekiyor'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Merhaba Lültfen mailinizi kontrol ediniz'),
+                Text('Onay linkini tıklayıp tekrar giriş yapmalısınız'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Anladım'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
