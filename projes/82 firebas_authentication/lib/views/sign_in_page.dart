@@ -55,7 +55,11 @@ class _SignInPageState extends State<SignInPage> {
             MyRaisedButton(
               color: Colors.lightBlueAccent,
               child: Text("Sign in with google"),
-              onPressed: () {},
+              onPressed: () async {
+                final user = await Provider.of<Auth>(context, listen: false)
+                    .signInWithGoogle();
+                print(user);
+              },
             ),
           ],
         ),
