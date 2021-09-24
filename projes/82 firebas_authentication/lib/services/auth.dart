@@ -11,9 +11,14 @@ class Auth {
 
   Future<User?> createUserWithEmailAndPassword(
       String email, String password) async {
-    final userCredentials = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email, password: password);
-    return userCredentials.user;
+    UserCredential? userCredential;
+    try {
+      userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      rethrow;
+    }
   }
 
   Future<User?> signInWithEmailAndPassword(

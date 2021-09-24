@@ -1,5 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebas_authentication/services/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -261,20 +262,24 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (_registerKey.currentState!.validate()) {
-                  final user = await Provider.of<Auth>(context, listen: false)
-                      .createUserWithEmailAndPassword(
-                          _emailController.text, _passwordController.text);
+                try {
+                  if (_registerKey.currentState!.validate()) {
+                    final user = await Provider.of<Auth>(context, listen: false)
+                        .createUserWithEmailAndPassword(
+                            _emailController.text, _passwordController.text);
 
-                  if (user != null && !user.emailVerified) {
-                    await user.sendEmailVerification();
+                    if (user != null && !user.emailVerified) {
+                      await user.sendEmailVerification();
+                    }
+                    await _showMyDialog();
+                    await Provider.of<Auth>(context, listen: false)
+                        .signOutAnonymous();
+                    setState(() {
+                      _formStatus = FormStatus.signIn;
+                    });
                   }
-                  await _showMyDialog();
-                  await Provider.of<Auth>(context, listen: false)
-                      .signOutAnonymous();
-                  setState(() {
-                    _formStatus = FormStatus.signIn;
-                  });
+                } on FirebaseAuthException catch (e) {
+                  print(e);
                 }
               },
               child: Text("Kayıt ol"),
