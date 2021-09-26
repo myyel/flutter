@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "37626734123",
+    "project_id": "library-demo-project-461c7",
+    "storage_bucket": "library-demo-project-461c7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37626734123:android:cab58b5b1d5f670ee62c6e",
+        "android_client_info": {
+          "package_name": "com.myyel.mvvm_uygulama_mimarisi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "37626734123-36gast9uupkke4rk7h0a3svm6at7igag.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1yKjc-fPQwEF7oltYIJc2RhHonOrOjho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "37626734123-36gast9uupkke4rk7h0a3svm6at7igag.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
