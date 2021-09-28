@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mvvm_uygulama_mimarisi/views/books_view_model.dart';
+import 'package:mvvm_uygulama_mimarisi/models/books_model.dart';
 import 'package:provider/provider.dart';
+
+import 'books_view_model.dart';
 
 class BooksView extends StatefulWidget {
   const BooksView({Key? key}) : super(key: key);
@@ -31,11 +32,13 @@ class _BooksViewState extends State<BooksView> {
                 ),
               ),
               Divider(),
-              StreamBuilder<QuerySnapshot>(
-                stream: kitaplarRef.snapshots(),
+              StreamBuilder<List<Books>>(
+                stream: Provider.of<BooksViewModel>(context, listen: false)
+                    .getBookList(),
                 builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> asyncSnapshot) {
+                    AsyncSnapshot<List<Books>> asyncSnapshot) {
                   if (asyncSnapshot.hasError) {
+                    print(asyncSnapshot);
                     return Center(
                       child: Text("bir hata oluştu"),
                     );
@@ -43,11 +46,10 @@ class _BooksViewState extends State<BooksView> {
                     if (!asyncSnapshot.hasData) {
                       return CircularProgressIndicator();
                     } else {
-                      List<DocumentSnapshot> kitaplist =
-                          asyncSnapshot.data!.docs;
+                      List<Books>? kitaplist = asyncSnapshot.data;
                       return Flexible(
                         child: ListView.builder(
-                            itemCount: kitaplist.length,
+                            itemCount: kitaplist!.length,
                             itemBuilder: (context, index) {
                               return Dismissible(
                                 key: UniqueKey(),
@@ -67,17 +69,17 @@ class _BooksViewState extends State<BooksView> {
                                 child: Card(
                                   child: ListTile(
                                     title: Text(
-                                      kitaplist[index].get("ad"),
+                                      kitaplist[index].bookName,
                                     ),
                                     subtitle: Text(
-                                      kitaplist[index].get("yazar"),
+                                      kitaplist[index].authorName,
                                     ),
                                   ),
                                 ),
-                                onDismissed: (_) {
-                                  kitaplist[index]
-                                      .reference
-                                      .update({"sene": FieldValue.delete()});
+                                onDismissed: (_) async {
+                                  await Provider.of<BooksViewModel>(context,
+                                          listen: false)
+                                      .deleteBook(book: kitaplist[index]);
                                 },
                               );
                             }),
