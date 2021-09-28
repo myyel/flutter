@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:mvvm_uygulama_mimarisi/crud_page.dart';
+import 'package:mvvm_uygulama_mimarisi/views/books_view.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
                 child: Text("Beklenmeyen bir hata oluştu"),
               );
             } else if (snapshot.hasData) {
-              return CrudPage();
+              return BooksView();
             } else {
               return Center(child: CircularProgressIndicator());
             }
