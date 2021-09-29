@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mvvm_uygulama_mimarisi/models/books_model.dart';
+import 'package:mvvm_uygulama_mimarisi/views/add_book_view.dart';
 import 'package:provider/provider.dart';
 
 import 'books_view_model.dart';
@@ -93,7 +94,10 @@ class _BooksViewState extends State<BooksView> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () async {},
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => AddBookView()));
+          },
           child: Icon(Icons.add),
         ),
       ),
