@@ -18,7 +18,7 @@ class Database {
     await _firestore.collection(referencePath).doc(id).delete();
   }
 
-  ///Yeni veri ekleme
+  ///Yeni veri ekleme ve güncelleme
   Future<void> setBookData(
       {required String collectionRef,
       required Map<String, dynamic> bookAsMap}) async {

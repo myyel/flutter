@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mvvm_uygulama_mimarisi/models/books_model.dart';
 import 'package:mvvm_uygulama_mimarisi/views/add_book_view.dart';
+import 'package:mvvm_uygulama_mimarisi/views/update_book_view.dart';
 import 'package:provider/provider.dart';
 
 import 'books_view_model.dart';
@@ -19,6 +21,7 @@ class _BooksViewState extends State<BooksView> {
     return ChangeNotifierProvider<BooksViewModel>(
       create: (BuildContext context) => BooksViewModel(),
       builder: (context, child) => Scaffold(
+        backgroundColor: Colors.grey[200],
         appBar: AppBar(
           title: Text("Cloud Crud İşlemleri"),
         ),
@@ -48,43 +51,7 @@ class _BooksViewState extends State<BooksView> {
                       return CircularProgressIndicator();
                     } else {
                       List<Books>? kitaplist = asyncSnapshot.data;
-                      return Flexible(
-                        child: ListView.builder(
-                            itemCount: kitaplist!.length,
-                            itemBuilder: (context, index) {
-                              return Dismissible(
-                                key: UniqueKey(),
-                                direction: DismissDirection.endToStart,
-                                background: Container(
-                                  alignment: Alignment.centerRight,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: Icon(
-                                      Icons.delete,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                  ),
-                                  color: Colors.red,
-                                ),
-                                child: Card(
-                                  child: ListTile(
-                                    title: Text(
-                                      kitaplist[index].bookName,
-                                    ),
-                                    subtitle: Text(
-                                      kitaplist[index].authorName,
-                                    ),
-                                  ),
-                                ),
-                                onDismissed: (_) async {
-                                  await Provider.of<BooksViewModel>(context,
-                                          listen: false)
-                                      .deleteBook(book: kitaplist[index]);
-                                },
-                              );
-                            }),
-                      );
+                      return BuildListView(kitaplist: kitaplist);
                     }
                   }
                 },
@@ -100,6 +67,111 @@ class _BooksViewState extends State<BooksView> {
           },
           child: Icon(Icons.add),
         ),
+      ),
+    );
+  }
+}
+
+class BuildListView extends StatefulWidget {
+  const BuildListView({
+    Key? key,
+    required this.kitaplist,
+  }) : super(key: key);
+
+  final List<Books>? kitaplist;
+
+  @override
+  _BuildListViewState createState() => _BuildListViewState();
+}
+
+class _BuildListViewState extends State<BuildListView> {
+  bool isFiltering = false;
+  late List<Books> filteredList;
+
+  @override
+  Widget build(BuildContext context) {
+    var fullList = widget.kitaplist;
+    return Flexible(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: TextField(
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: "Arama kitap adı",
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+              ),
+              onChanged: (value) {
+                if (value.isNotEmpty) {
+                  isFiltering = true;
+                  setState(() {
+                    filteredList = fullList!
+                        .where((book) => book.bookName
+                            .toLowerCase()
+                            .contains(value.toLowerCase()))
+                        .toList();
+                  });
+                } else {
+                  setState(() {
+                    WidgetsBinding.instance!.focusManager.primaryFocus!
+                        .unfocus();
+                    isFiltering = false;
+                  });
+                }
+              },
+            ),
+          ),
+          Flexible(
+            child: ListView.builder(
+                itemCount: isFiltering ? filteredList.length : fullList!.length,
+                itemBuilder: (context, index) {
+                  var list = isFiltering ? filteredList : fullList;
+                  return Slidable(
+                    child: Card(
+                      child: ListTile(
+                        title: Text(
+                          list![index].bookName,
+                        ),
+                        subtitle: Text(
+                          list![index].authorName,
+                        ),
+                      ),
+                    ),
+                    actionPane: SlidableScrollActionPane(),
+                    actionExtentRatio: .15,
+                    secondaryActions: [
+                      IconSlideAction(
+                        caption: 'Düzenle',
+                        color: Colors.orange,
+                        icon: Icons.edit,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UpdateBookView(
+                                book: list[index],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      IconSlideAction(
+                        caption: 'Sil',
+                        color: Colors.red,
+                        icon: Icons.delete,
+                        onTap: () async {
+                          await Provider.of<BooksViewModel>(context,
+                                  listen: false)
+                              .deleteBook(book: list[index]);
+                        },
+                      ),
+                    ],
+                  );
+                }),
+          ),
+        ],
       ),
     );
   }
