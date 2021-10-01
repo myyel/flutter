@@ -6,6 +6,7 @@ import 'package:mvvm_uygulama_mimarisi/views/add_book_view.dart';
 import 'package:mvvm_uygulama_mimarisi/views/update_book_view.dart';
 import 'package:provider/provider.dart';
 
+import 'barrow_list_view.dart';
 import 'books_view_model.dart';
 
 class BooksView extends StatefulWidget {
@@ -135,12 +136,29 @@ class _BuildListViewState extends State<BuildListView> {
                           list![index].bookName,
                         ),
                         subtitle: Text(
-                          list![index].authorName,
+                          list[index].authorName,
                         ),
                       ),
                     ),
                     actionPane: SlidableScrollActionPane(),
                     actionExtentRatio: .15,
+                    actions: [
+                      IconSlideAction(
+                        caption: 'Kayıtlar',
+                        color: Colors.greenAccent,
+                        icon: Icons.account_circle_outlined,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BarrowListView(
+                                book: list[index],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                     secondaryActions: [
                       IconSlideAction(
                         caption: 'Düzenle',
