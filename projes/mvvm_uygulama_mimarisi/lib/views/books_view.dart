@@ -43,7 +43,7 @@ class _BooksViewState extends State<BooksView> {
                 builder: (BuildContext context,
                     AsyncSnapshot<List<Books>> asyncSnapshot) {
                   if (asyncSnapshot.hasError) {
-                    print(asyncSnapshot);
+                    print("hata : $asyncSnapshot");
                     return Center(
                       child: Text("bir hata oluştu"),
                     );

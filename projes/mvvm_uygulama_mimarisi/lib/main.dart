@@ -17,8 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamProvider<QuerySnapshot?>(
       initialData: null,
-      create: (_) =>
-          FirebaseFirestore.instance.collection("Kitaplar").snapshots(),
+      create: (_) => FirebaseFirestore.instance.collection("Books").snapshots(),
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(

@@ -15,10 +15,12 @@ class UpdateBookViewModel extends ChangeNotifier {
     ///Form alanından gelen verilerle bir book objesi oluşturacak
 
     Books newBook = Books(
-        id: book.id,
-        publishDate: TimeCalculator.dateTimeToTimeStamp(publishDate),
-        bookName: bookName,
-        authorName: authorName);
+      id: book.id,
+      publishDate: TimeCalculator.dateTimeToTimeStamp(publishDate),
+      bookName: bookName,
+      authorName: authorName,
+      borrows: book.borrows,
+    );
 
     ///Bu kitap bilgisini database servisi üzerinden firestore'a yazacak
 
