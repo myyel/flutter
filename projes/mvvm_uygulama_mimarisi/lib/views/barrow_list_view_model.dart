@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mvvm_uygulama_mimarisi/models/books_model.dart';
 import 'package:mvvm_uygulama_mimarisi/models/borrow_info_model.dart';
@@ -18,5 +19,10 @@ class BarrowListViewModel with ChangeNotifier {
 
     await _database.setBookData(
         collectionRef: collectionRef, bookAsMap: newBook.toMap());
+  }
+
+  Future<void> deletePhoto(String photoUrl) async {
+    Reference photoRef = FirebaseStorage.instance.refFromURL(photoUrl);
+    await photoRef.delete();
   }
 }

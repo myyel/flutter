@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'barrow_list_view_model.dart';
 
 class BarrowListView extends StatefulWidget {
-  late Books book;
+  final Books book;
   BarrowListView({required this.book});
 
   @override
@@ -26,14 +26,6 @@ class _BarrowListViewState extends State<BarrowListView> {
     return ChangeNotifierProvider<BarrowListViewModel>(
       create: (context) => BarrowListViewModel(),
       builder: (context, _) => Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            FirebaseStorage _storeage = FirebaseStorage.instance;
-            Reference photosRef = _storeage.ref().child("photos");
-            var photoURL = await photosRef.child("index.jpg").getDownloadURL();
-            print(photoURL);
-          },
-        ),
         appBar: AppBar(
           title: Text("${widget.book.bookName}Kayıt Listesi"),
         ),
@@ -62,10 +54,13 @@ class _BarrowListViewState extends State<BarrowListView> {
                 onTap: () async {
                   BorrowInfo? newBarrowInfo =
                       await showModalBottomSheet<BorrowInfo>(
+                          isDismissible: false,
+                          enableDrag: false,
                           context: context,
                           builder: (BuildContext context) {
-                            return BarrowForm();
+                            return BarrowForm()
                           });
+
                   if (newBarrowInfo != null) {
                     setState(() {
                       barrowList.add(newBarrowInfo);
@@ -113,23 +108,29 @@ class _BarrowFormState extends State<BarrowForm> {
   late DateTime _selecetedReturnDate;
   final _formKey = GlobalKey<FormState>();
 
+  String? _photoUrl;
+
   File? _image;
   final picker = ImagePicker();
 
   Future getImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 20);
 
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        uploadImageToStorage(_image!);
       } else {
         print("No İmage selected");
       }
     });
+
+    if (pickedFile != null) {
+      _photoUrl = await uploadImageToStorage(_image!);
+    }
   }
 
-  Future<void> uploadImageToStorage(File imageFile) async {
+  Future<String> uploadImageToStorage(File imageFile) async {
     String path = "${DateTime.now().millisecondsSinceEpoch}.jpg";
 
     TaskSnapshot uploadTask = await FirebaseStorage.instance
@@ -140,7 +141,7 @@ class _BarrowFormState extends State<BarrowForm> {
 
     String uploadedImageUrl = await uploadTask.ref.getDownloadURL();
 
-    print(uploadedImageUrl);
+    return uploadedImageUrl;
   }
 
   @override
@@ -158,173 +159,193 @@ class _BarrowFormState extends State<BarrowForm> {
   }
 
   Widget build(BuildContext context) {
-    return Container(
-      height: 500,
-      padding: EdgeInsets.all(14),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Flexible(
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          /*child: (_image == null)
-                              ? Image(
-                                  image: NetworkImage(
-                                    "https://s3-us-east-2.amazonaws.com/maryville/wp-content/uploads/2020/01/07163629/author-at-work-500x333.jpg",
-                                  ),
-                                )
-                              : Image.file(_image!),*/
-                          backgroundImage: (_image != null)
-                              ? FileImage(_image!)
-                              : NetworkImage(
-                                      "https://s3-us-east-2.amazonaws.com/maryville/wp-content/uploads/2020/01/07163629/author-at-work-500x333.jpg")
-                                  as ImageProvider<Object>?,
-                        ),
-                        Positioned(
-                          bottom: -5,
-                          right: -5,
-                          child: IconButton(
-                            onPressed: getImage,
-                            icon: Icon(
-                              Icons.photo_camera_rounded,
-                              color: Colors.grey.shade100,
-                              size: 26,
+    return ChangeNotifierProvider(
+      create: (context)=>BarrowListViewModel(),
+      builder: (context,_)=>Container(
+        height: 500,
+        padding: EdgeInsets.all(14),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Flexible(
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 40,
+                            /*child: (_image == null)
+                                ? Image(
+                                    image: NetworkImage(
+                                      "https://s3-us-east-2.amazonaws.com/maryville/wp-content/uploads/2020/01/07163629/author-at-work-500x333.jpg",
+                                    ),
+                                  )
+                                : Image.file(_image!),*/
+                            backgroundImage: (_image != null)
+                                ? FileImage(_image!)
+                                : NetworkImage(
+                                "https://s3-us-east-2.amazonaws.com/maryville/wp-content/uploads/2020/01/07163629/author-at-work-500x333.jpg")
+                            as ImageProvider<Object>?,
+                          ),
+                          Positioned(
+                            bottom: -5,
+                            right: -5,
+                            child: IconButton(
+                              onPressed: getImage,
+                              icon: Icon(
+                                Icons.photo_camera_rounded,
+                                color: Colors.grey.shade100,
+                                size: 26,
+                              ),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Flexible(
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: nameCtr,
-                          decoration: InputDecoration(
-                            hintText: "Ad",
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Adınızı giriniz";
-                            } else {
-                              return null;
-                            }
-                          },
-                        ),
-                        TextFormField(
-                          controller: surnameCtr,
-                          decoration: InputDecoration(
-                            hintText: "Soyad",
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Soyadınızı giriniz";
-                            } else {
-                              return null;
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: TextFormField(
-                      onTap: () async {
-                        _selectedBarrowDate = (await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(
-                            Duration(days: 365),
-                          ),
-                        ))!;
-                        barrowDateCtr.text = TimeCalculator.dateTimeToString(
-                            _selectedBarrowDate);
-                      },
-                      controller: barrowDateCtr,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.date_range),
-                        hintText: "Alım Tarihi",
+                          )
+                        ],
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Lütfen Tarih Seçiniz";
-                        } else {
-                          return null;
-                        }
-                      },
                     ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Flexible(
-                    child: TextFormField(
-                      onTap: () async {
-                        _selecetedReturnDate = (await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(
-                            Duration(days: 365),
+                    Flexible(
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: nameCtr,
+                            decoration: InputDecoration(
+                              hintText: "Ad",
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Adınızı giriniz";
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
-                        ))!;
-                        returnDateCtr.text = TimeCalculator.dateTimeToString(
-                            _selecetedReturnDate);
-                      },
-                      controller: returnDateCtr,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.date_range),
-                        hintText: "İade Tarihi",
+                          TextFormField(
+                            controller: surnameCtr,
+                            decoration: InputDecoration(
+                              hintText: "Soyad",
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Soyadınızı giriniz";
+                              } else {
+                                return null;
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Lütfen Tarih Seçiniz";
-                        } else {
-                          return null;
-                        }
-                      },
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    /// kulanıcı bilgileri ile BorrowInfo objesi oluşturacağız
-                    BorrowInfo newBorrowInfo = BorrowInfo(
-                        photoUrl: "",
-                        name: nameCtr.text,
-                        surname: surnameCtr.text,
-                        borrowDate: TimeCalculator.dateTimeToTimeStamp(
-                            _selectedBarrowDate),
-                        returnDate: TimeCalculator.dateTimeToTimeStamp(
-                            _selectedBarrowDate));
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: TextFormField(
+                        onTap: () async {
+                          _selectedBarrowDate = (await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(
+                              Duration(days: 365),
+                            ),
+                          ))!;
+                          barrowDateCtr.text = TimeCalculator.dateTimeToString(
+                              _selectedBarrowDate);
+                        },
+                        controller: barrowDateCtr,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.date_range),
+                          hintText: "Alım Tarihi",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Lütfen Tarih Seçiniz";
+                          } else {
+                            return null;
+                          }
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Flexible(
+                      child: TextFormField(
+                        onTap: () async {
+                          _selecetedReturnDate = (await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(
+                              Duration(days: 365),
+                            ),
+                          ))!;
+                          returnDateCtr.text = TimeCalculator.dateTimeToString(
+                              _selecetedReturnDate);
+                        },
+                        controller: returnDateCtr,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.date_range),
+                          hintText: "İade Tarihi",
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Lütfen Tarih Seçiniz";
+                          } else {
+                            return null;
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          /// kulanıcı bilgileri ile BorrowInfo objesi oluşturacağız
+                          BorrowInfo newBorrowInfo = BorrowInfo(
+                              photoUrl: _photoUrl?? "https://img.favpng.com/11/23/25/font-awesome-computer-icons-user-font-png-favpng-NQGbZvSGDv6eNj5S6cdzggBi4_t.jpg",
+                              name: nameCtr.text,
+                              surname: surnameCtr.text,
+                              borrowDate: TimeCalculator.dateTimeToTimeStamp(
+                                  _selectedBarrowDate),
+                              returnDate: TimeCalculator.dateTimeToTimeStamp(
+                                  _selectedBarrowDate));
 
-                    /// navigator.pop
-                    Navigator.pop(context, newBorrowInfo);
-                  }
-                },
-                child: Text("Ödünç Kayıt EKle"),
-              )
-            ],
+                          /// navigator.pop
+                          Navigator.pop(context, newBorrowInfo);
+                        }
+                      },
+                      child: Text("Ödünç Kayıt EKle"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+
+                        if(_photoUrl!=null){
+                          Provider.of<BarrowListViewModel>(context,listen: false).deletePhoto(_photoUrl!);
+                        }
+
+                        Navigator.pop(context);
+                      },
+                      child: Text("İptal"),
+                      style: ElevatedButton.styleFrom(primary: Colors.red),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
